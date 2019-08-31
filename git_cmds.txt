@@ -1,0 +1,18 @@
+adding folders to git repo
+1. clone the repo
+2. copy the desired folder into your repo
+3. git status
+4. git add folder-name / git add -A (to add all the folders - recommended)
+5. git commit -m 'commit message'
+6. git push origin master
+(If git push origin master doesnt work cuz someone else pushed and all, just do)
+7. git pull origin master
+
+
+removing a folder from your git repo
+1. clone the repo
+2. rmdir folder-name
+3. git status
+4. git add removed-folder-name
+next two steps same as the those above
+
