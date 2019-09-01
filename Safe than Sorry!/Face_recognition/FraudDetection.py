@@ -9,19 +9,28 @@ import face_recognition
 import numpy as np
 import pandas as pd
 import cv2 as cv
+import imutils
 
 
 def LoadDatabase(FilePath):
     images=list()
+    encoding=list()
+    loaded_image=list()
     AccNo=list()
-    Database=pd.read_csv(FilePath)
+    Database=pd.read_excel(FilePath)
     dataFrame=pd.DataFrame(Database)
     images=dataFrame.Image
     AccNo=dataFrame.AccNo
+    dim=(1920,1920)
+    angle270 = 270
     for i in range(len(images)):
-        images[i]=face_recognition.load_image_file(images[i])
-        images[i]=face_recognition.face_encodings(images[i])[0]
-    return images,AccNo
+        loaded_image.append(face_recognition.load_image_file(images[i]))
+        w,h,depth=loaded_image[i].shape
+        if(w!=1920 or h!=1920):
+            loaded_image[i]=imutils.rotate_bound(loaded_image[i],angle270)
+            loaded_image[i]=cv.resize(loaded_image[i],dim,cv.INTER_AREA)
+        encoding.append(face_recognition.face_encodings(loaded_image[i]))
+    return encoding,AccNo
 def LoadImage(Image):
     image=face_recognition.load_image_file(Image)
     encoded=face_recognition.face_encodings(image)[0]
@@ -42,14 +51,20 @@ def readVideo(known_encoding,AccNo):
             for face_encoding in face_encodings:
                 matches=face_recognition.compare_faces(known_encoding,face_encoding)
                 name="Unknown"
-                face_distance=face_recognition.face_distance(known_encoding,face_encoding)
-                best_match_index = np.argmin(face_distance)
-                if matches[best_match_index]:
-                    name = AccNo[best_match_index]
+                #best_match_index = np.argmin(face_distances)
+                if np.any(matches):
+                    first_match_index = matches.index(True)
+                    name = AccNo[first_match_index]
 
-                face_names.append(name)
-                
+                face_names.append(name)  
         process_frame=not process_frame
+        cv.imshow('Video', frame)
+
+        # Hit 'q' on the keyboard to quit!
+        if cv.waitKey(1) & 0xFF == ord('q'):
+            break
+    video_capture.release()
+    cv.destroyAllWindows()
     return face_names
                 
                 
