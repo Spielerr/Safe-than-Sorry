@@ -31,12 +31,17 @@ def LoadDatabase(FilePath):
             loaded_image[i]=cv.resize(loaded_image[i],dim,cv.INTER_AREA)
         encoding.append(face_recognition.face_encodings(loaded_image[i]))
     return encoding,AccNo
+
+
 def LoadImage(Image):
     image=face_recognition.load_image_file(Image)
     encoded=face_recognition.face_encodings(image)[0]
     return encoded
+
+
 def readVideo(known_encoding,AccNo):
     face_encodings,face_locations,face_names=list(),list(),list()
+    count=0
     process_frame=True
     while True:
         video_capture=cv.VideoCapture(0)
@@ -53,13 +58,14 @@ def readVideo(known_encoding,AccNo):
                 name="Unknown"
                 #best_match_index = np.argmin(face_distances)
                 if np.any(matches):
-                    first_match_index = matches.index(True)
+                    first_match_index = np.where(matches==True)[0]
                     name = AccNo[first_match_index]
-
-                face_names.append(name)  
-        process_frame=not process_frame
+                face_names.append(name) 
+            process_frame=not process_frame
         cv.imshow('Video', frame)
-
+        count+=1
+        if count==10:
+            break
         # Hit 'q' on the keyboard to quit!
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
