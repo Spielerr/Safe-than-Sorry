@@ -91,7 +91,7 @@ def review_categorizer(filename):
                         print("some nlu error")
                     try:
                         print("done")
-                        connection[category] = connection[category].append({"Bank name": bank_name, "Customer name": uname, "Issue type":itype,  "Review": str(sent), "Review_Lemma": sent_lemma, "Keyword": keyword, "Sentiment": sentiment,
+                        connection[category] = connection[category].append({"Bank name": bank_name, "Category":category ,"Customer name": uname, "Issue type":itype,  "Review": str(sent), "Review_Lemma": sent_lemma, "Keyword": keyword, "Sentiment": sentiment,
                                                                              "Recency": recency, "Place":place, "joy": joy, "sadness": sadness, "anger": anger, "disgust": disgust, "fear": fear}, ignore_index=True)
                     except:
                         # print("Error")
@@ -110,4 +110,4 @@ def review_categorizer(filename):
 
 
 
-review_categorizer("bank_example.csv")
+review_categorizer("final_bank.csv")

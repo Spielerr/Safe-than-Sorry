@@ -110,4 +110,4 @@ def review_categorizer(filename):
 
 
 
-review_categorizer("bank_example.csv")
+review_categorizer("example.csv")
