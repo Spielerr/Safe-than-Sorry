@@ -72,8 +72,13 @@ def LoadAccImages(TransactionAccNo,FilePath):
     AccNo=dataframe.Account_Number
     index_of_account=AccNo.index(TransactionAccNo)
     images=dataframe.Encoding
-    images_encoding=images[index_of_account]
-    return images_encoding
+    image=images[index_of_account]
+    image=image.split("|")
+    image_encoding=list()
+    for i in image:
+        j=face_recognition.load_from_file(i)
+        image_encoding.append(face_recognition.face_encodings(j))
+    return image_encoding
     
                 
 def Fraud(Transaction_Acc_no,FilePath):
