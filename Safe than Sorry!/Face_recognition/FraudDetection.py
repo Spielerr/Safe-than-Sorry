@@ -39,7 +39,7 @@ def LoadImage(Image):
     return encoded
 
 
-def readVideo(known_encoding,AccNo):
+def readVideo(known_encoding):
     face_encodings,face_locations,face_names=list(),list(),list()
     count=0
     process_frame=True
@@ -49,18 +49,12 @@ def readVideo(known_encoding,AccNo):
         small_frame=cv.resize(frame,(0,0),fx=0.25,fy=0.25)
         rgb_small_frame=small_frame[:,:,::-1]
         if process_frame:
-            face_locations=face_recognition.face_locations(rgb_small_frame)
             face_encodings=face_recognition.face_encodings(rgb_small_frame,face_locations)
-            
-            face_names=[]
             for face_encoding in face_encodings:
                 matches=face_recognition.compare_faces(known_encoding,face_encoding)
-                name="Unknown"
                 #best_match_index = np.argmin(face_distances)
                 if np.any(matches):
-                    first_match_index = np.where(matches==True)[0]
-                    name = AccNo[first_match_index]
-                face_names.append(name) 
+                    return True
             process_frame=not process_frame
         cv.imshow('Video', frame)
         count+=1
@@ -72,14 +66,20 @@ def readVideo(known_encoding,AccNo):
     video_capture.release()
     cv.destroyAllWindows()
     return face_names
-                
+def LoadAccImages(TransactionAccNo,FilePath):
+    dataframe=pd.read_excel(FilePath)
+    AccNo,images=list(),list()
+    AccNo=dataframe.Account_Number
+    index_of_account=AccNo.index(TransactionAccNo)
+    images=dataframe.Encoding
+    images_encoding=images[index_of_account]
+    return images_encoding
+    
                 
 def Fraud(Transaction_Acc_no,FilePath):
-    images,AccNO=LoadDatabase(FilePath)
-    face_Name=readVideo(images,AccNO)
-    if Transaction_Acc_no in face_Name:
-        return True
-    return False
+    image_encoding=LoadAccImages(Transaction_Acc_no,FilePath)
+    #images,AccNO=LoadDatabase(FilePath)
+    return readVideo(image_encoding)
     
               
                 
