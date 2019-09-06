@@ -13,4 +13,4 @@ def isFace():
         return True
     return False
     
-    
+print(isFace())   
