@@ -48,14 +48,19 @@ def readVideo(known_encoding):
         ret,frame=video_capture.read()
         small_frame=cv.resize(frame,(0,0),fx=0.25,fy=0.25)
         rgb_small_frame=small_frame[:,:,::-1]
+        matches=list()
         if process_frame:
+            face_locations=face_recognition.face_locations(rgb_small_frame)
             face_encodings=face_recognition.face_encodings(rgb_small_frame,face_locations)
             for face_encoding in face_encodings:
-                matches=face_recognition.compare_faces(known_encoding,face_encoding,0.8)
+                matches=face_recognition.compare_faces(known_encoding,face_encoding,0.6)
                 #best_match_index = np.argmin(face_distances)
-                if np.any(matches):
-                    return True
+            
         cv.imshow('Video', frame)
+        matches=list(matches)
+        print(matches)
+        if True in matches:
+            return True
         count+=1
         if count==5:
             break
@@ -66,7 +71,7 @@ def readVideo(known_encoding):
     cv.destroyAllWindows()
     return False
 def LoadAccImages(TransactionAccNo,FilePath):
-    dataframe=pd.read_csv(FilePath)
+    dataframe=pd.read_excel(FilePath)
     AccNo,images=list(),list()
     AccNo=dataframe["AccNo"]
     index_of_account=0
@@ -81,7 +86,11 @@ def LoadAccImages(TransactionAccNo,FilePath):
     image_encoding=list()
     for i in image:
         j=face_recognition.load_image_file(i)
-        image_encoding.append(face_recognition.face_encodings(j))
+        w,h,depth=j.shape
+        if w!=1920 or h!=1920:
+            j=imutils.rotate_bound(j,270)
+            j=cv.resize(j,(1920,1920),cv.INTER_AREA)
+        image_encoding.append(face_recognition.face_encodings(j)[0])
     return image_encoding
     
                 
