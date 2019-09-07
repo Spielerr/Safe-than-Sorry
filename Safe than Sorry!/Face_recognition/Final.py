@@ -8,7 +8,7 @@ Created on Sat Aug 31 15:18:42 2019
 import FraudDetection as fd
 def isFace():
     TransactionAccountNo=int(input())
-    FilePath="database.xlsx"
+    FilePath="database.csv"
     if fd.Fraud(TransactionAccountNo,FilePath):
         return True
     return False

@@ -17,7 +17,7 @@ def LoadDatabase(FilePath):
     encoding=list()
     loaded_image=list()
     AccNo=list()
-    Database=pd.read_excel(FilePath)
+    Database=pd.read_csv(FilePath)
     dataFrame=pd.DataFrame(Database)
     images=dataFrame.Image
     AccNo=dataFrame.AccNo
@@ -71,7 +71,7 @@ def readVideo(known_encoding):
     cv.destroyAllWindows()
     return False
 def LoadAccImages(TransactionAccNo,FilePath):
-    dataframe=pd.read_excel(FilePath)
+    dataframe=pd.read_csv(FilePath)
     AccNo,images=list(),list()
     AccNo=dataframe["AccNo"]
     index_of_account=0
