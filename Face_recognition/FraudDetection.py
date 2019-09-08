@@ -17,7 +17,7 @@ def LoadDatabase(FilePath):
     encoding=list()
     loaded_image=list()
     AccNo=list()
-    Database=pd.read_csv(FilePath)
+    Database=pd.read_excel(FilePath)
     dataFrame=pd.DataFrame(Database)
     images=dataFrame.Image
     AccNo=dataFrame.AccNo
@@ -43,6 +43,7 @@ def readVideo(known_encoding):
     face_encodings,face_locations=list(),list()
     count=0
     process_frame=True
+    check=list()
     while True:
         video_capture=cv.VideoCapture(0)
         ret,frame=video_capture.read()
@@ -53,36 +54,42 @@ def readVideo(known_encoding):
             face_locations=face_recognition.face_locations(rgb_small_frame)
             face_encodings=face_recognition.face_encodings(rgb_small_frame,face_locations)
             for face_encoding in face_encodings:
-                matches=face_recognition.compare_faces(known_encoding,face_encoding,0.6)
+                matches=face_recognition.compare_faces(known_encoding,face_encoding,0.5)
                 #best_match_index = np.argmin(face_distances)
             
         cv.imshow('Video', frame)
         matches=list(matches)
-        print(matches)
-        if True in matches:
-            return True
+        check.extend(matches)
         count+=1
         if count==5:
             break
         # Hit 'q' on the keyboard to quit!
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
+    
+    countTrue=check.count(True)
+    countFalse=check.count(False)
+    if countTrue>countFalse:
+        return True
     video_capture.release()
     cv.destroyAllWindows()
     return False
 def LoadAccImages(TransactionAccNo,FilePath):
-    dataframe=pd.read_csv(FilePath)
-    AccNo,images=list(),list()
+    dataframe=pd.read_excel(FilePath)
+    images=dataframe.groupby("acc_no")["photo"].apply(lambda x:x.tolist()).to_dict()
+    image=images[TransactionAccNo]
+    """
     AccNo=dataframe["AccNo"]
     index_of_account=0
     for i in range(len(AccNo)):
-        if int(AccNo[i])==TransactionAccNo:
+        if AccNo[i]==TransactionAccNo:
             index_of_account=i
             break;
     #index_of_account=AccNo.index(TransactionAccNo)
     images=dataframe["Image"]
     image=images[index_of_account]
     image=image.split("|")
+    """
     image_encoding=list()
     for i in image:
         j=face_recognition.load_image_file(i)
@@ -90,14 +97,20 @@ def LoadAccImages(TransactionAccNo,FilePath):
         if w!=1920 or h!=1920:
             j=imutils.rotate_bound(j,270)
             j=cv.resize(j,(1920,1920),cv.INTER_AREA)
-        image_encoding.append(face_recognition.face_encodings(j)[0])
+        k=face_recognition.face_encodings(j)
+        if len(k)>0:
+            image_encoding.append(k)
     return image_encoding
     
                 
 def Fraud(Transaction_Acc_no,FilePath):
     image_encoding=LoadAccImages(Transaction_Acc_no,FilePath)
     #images,AccNO=LoadDatabase(FilePath)
-    return readVideo(image_encoding)
+    check=list()
+    for i in image_encoding:
+        check.append(readVideo(i))
+    
+    return check
     
               
                 
